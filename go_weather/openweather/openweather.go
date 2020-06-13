@@ -1,7 +1,7 @@
 package openweather
 
 import (
-	"../endpoints/data"
+	"../endpoints"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -12,7 +12,7 @@ type Client struct {
 	ApiKey string
 }
 
-func (o Client) FetchWeatherForCity(city string) data.Weather {
+func (o Client) FetchWeatherForCity(city string) endpoints.Weather {
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", "https://api.openweathermap.org/data/2.5/weather", nil)
 	if err != nil {
@@ -40,7 +40,7 @@ func (o Client) FetchWeatherForCity(city string) data.Weather {
 		log.Printf("an error occured: %v", err)
 	}
 
-	weather := data.Weather{
+	weather := endpoints.Weather{
 		Temperature: weatherResponse.Main.Temp,
 		Pressure:    weatherResponse.Main.Pressure,
 		CityName:    weatherResponse.Name,

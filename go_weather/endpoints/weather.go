@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"./data"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -25,11 +24,11 @@ func CityHandler(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	writer.WriteHeader(http.StatusOK)
 
-	weather := data.Weather{
+	weather := Weather{
 		Temperature: 0,
 		Pressure:    0,
 		CityName:    vars["city"],
-		CityId:      "",
+		CityId:      0,
 	}
 	err := json.NewEncoder(writer).Encode(weather)
 	if err != nil {
