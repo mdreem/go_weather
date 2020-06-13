@@ -1,4 +1,4 @@
-package endpoints
+package data
 
 type Weather struct {
 	Temperature float64 `json:"temperature"`

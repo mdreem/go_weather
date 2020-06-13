@@ -2,6 +2,7 @@ package main
 
 import (
 	"./endpoints"
+	"./openweather"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -9,9 +10,11 @@ import (
 
 func main() {
 	configuration := loadConfiguration()
-	fmt.Println("Token: " + configuration.ApiToken)
 
-	endpoints.Initialize()
+	openWeatherMapClient := openweather.Client{ApiKey: configuration.ApiToken}
+
+	controller := endpoints.WeatherDataController{OpenWeatherMapClient: openWeatherMapClient}
+	controller.Run()
 }
 
 type Configuration struct {

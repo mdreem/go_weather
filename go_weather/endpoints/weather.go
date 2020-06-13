@@ -1,38 +1,42 @@
 package endpoints
 
 import (
+	"../openweather"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
-func Initialize() {
+type WeatherDataController struct {
+	OpenWeatherMapClient openweather.Client
+}
+
+func (c WeatherDataController) Run() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/weather/{city}", CityHandler)
+	r.HandleFunc("/weather/{city}", c.CityHandler)
 	r.Use(responseHeaderMiddleware)
 
 	http.Handle("/", r)
 	err := http.ListenAndServe(":8000", nil)
 	if err != nil {
-		fmt.Println("Error occurred while starting http server:", err)
+		log.Println("error occurred while starting http server:", err)
 	}
 }
 
-func CityHandler(writer http.ResponseWriter, request *http.Request) {
+func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	writer.WriteHeader(http.StatusOK)
 
-	weather := Weather{
-		Temperature: 0,
-		Pressure:    0,
-		CityName:    vars["city"],
-		CityId:      0,
-	}
+	city := vars["city"]
+	log.Printf("fetching data for city '%s'", city)
+	weather := c.OpenWeatherMapClient.FetchWeatherForCity(city)
+
 	err := json.NewEncoder(writer).Encode(weather)
 	if err != nil {
-		fmt.Println("Error occurred:", err)
+		log.Println("error occurred:", err)
 	}
 }
 
@@ -40,7 +44,7 @@ func HomeHandler(writer http.ResponseWriter, _ *http.Request) {
 	writer.WriteHeader(200)
 	_, err := fmt.Fprintf(writer, "Home\n")
 	if err != nil {
-		fmt.Println("Error occurred:", err)
+		log.Println("error occurred:", err)
 	}
 }
 
