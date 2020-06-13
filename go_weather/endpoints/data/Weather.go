@@ -2,7 +2,7 @@ package data
 
 type Weather struct {
 	Temperature float64 `json:"temperature"`
-	Pressure    int     `json:"pressure"`
+	Pressure    float64 `json:"pressure"`
 	CityName    string  `json:"cityName"`
-	CityId      string  `json:"cityId"`
+	CityId      int64   `json:"cityId"`
 }

@@ -2,7 +2,7 @@ package openweather
 
 import (
 	"../endpoints/data"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -34,6 +34,17 @@ func (o Client) FetchWeatherForCity(city string) data.Weather {
 		log.Printf("an error occured: %v", err)
 	}
 
-	fmt.Print(string(body))
-	return data.Weather{}
+	weatherResponse := WeatherResponse{}
+	err = json.Unmarshal(body, &weatherResponse)
+	if err != nil {
+		log.Printf("an error occured: %v", err)
+	}
+
+	weather := data.Weather{
+		Temperature: weatherResponse.Main.Temp,
+		Pressure:    weatherResponse.Main.Pressure,
+		CityName:    weatherResponse.Name,
+		CityId:      weatherResponse.Id,
+	}
+	return weather
 }
