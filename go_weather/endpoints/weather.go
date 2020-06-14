@@ -28,16 +28,24 @@ func (c WeatherDataController) Run() {
 
 func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	writer.WriteHeader(http.StatusOK)
 
 	city := vars["city"]
 	log.Printf("fetching data for city '%s'", city)
-	weather := c.OpenWeatherMapClient.FetchWeatherForCity(city)
-
-	err := json.NewEncoder(writer).Encode(weather)
+	weather, err := c.OpenWeatherMapClient.FetchWeatherForCity(city)
 	if err != nil {
-		log.Println("error occurred:", err)
+		log.Println("error occurred while fetching weather data:", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
 	}
+
+	err = json.NewEncoder(writer).Encode(weather)
+	if err != nil {
+		log.Println("error occurred while converting data:", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
 }
 
 func HomeHandler(writer http.ResponseWriter, _ *http.Request) {

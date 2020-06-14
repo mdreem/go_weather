@@ -13,7 +13,7 @@ func TestFetchWeatherForCity(t *testing.T) {
 	defer server.Close()
 	client := Client{baseUrl: server.URL, apiKey: "noKey", client: server.Client()}
 
-	weatherForCity := client.FetchWeatherForCity("Twin Peaks")
+	weatherForCity, _ := client.FetchWeatherForCity("Twin Peaks")
 
 	if weatherForCity.CityName != "Twin Peaks" {
 		t.Errorf("expected city to be 'Twin Peaks', but it was '%s'", weatherForCity.CityName)
