@@ -4,7 +4,7 @@ import (
 	"./endpoints"
 	"./openweather"
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 )
 
@@ -24,13 +24,13 @@ type Configuration struct {
 func loadConfiguration() Configuration {
 	file, err := os.Open("configuration.json")
 	if err != nil {
-		fmt.Println("Error loading configuration file:", err)
+		log.Println("error loading configuration file:", err)
 		os.Exit(1)
 	}
 
 	defer func() {
 		if err := file.Close(); err != nil {
-			fmt.Println("Error closing file:", err)
+			log.Println("error closing file:", err)
 			os.Exit(1)
 		}
 	}()
@@ -40,7 +40,7 @@ func loadConfiguration() Configuration {
 
 	err = decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("Error decoding configuration file:", err)
+		log.Println("error decoding configuration file:", err)
 	}
 	return configuration
 }
