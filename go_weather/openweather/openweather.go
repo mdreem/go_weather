@@ -9,22 +9,27 @@ import (
 )
 
 type Client struct {
-	ApiKey string
+	baseUrl string
+	apiKey  string
+	client  *http.Client
+}
+
+func CreateClient(apiKey string) Client {
+	return Client{baseUrl: "https://api.openweathermap.org", apiKey: apiKey, client: &http.Client{}}
 }
 
 func (o Client) FetchWeatherForCity(city string) data.Weather {
-	client := &http.Client{}
-	request, err := http.NewRequest("GET", "https://api.openweathermap.org/data/2.5/weather", nil)
+	request, err := http.NewRequest("GET", o.baseUrl+"/data/2.5/weather", nil)
 	if err != nil {
 		log.Printf("an error occured: %v", err)
 	}
 
 	q := request.URL.Query()
 	q.Add("q", city)
-	q.Add("appid", o.ApiKey)
+	q.Add("appid", o.apiKey)
 	request.URL.RawQuery = q.Encode()
 
-	response, err := client.Do(request)
+	response, err := o.client.Do(request)
 	if err != nil {
 		log.Printf("an error occured: %v", err)
 	}

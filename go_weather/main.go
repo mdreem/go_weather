@@ -11,7 +11,7 @@ import (
 func main() {
 	configuration := loadConfiguration()
 
-	openWeatherMapClient := openweather.Client{ApiKey: configuration.ApiToken}
+	openWeatherMapClient := openweather.CreateClient(configuration.ApiToken)
 
 	controller := endpoints.WeatherDataController{OpenWeatherMapClient: openWeatherMapClient}
 	controller.Run()
