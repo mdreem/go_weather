@@ -19,6 +19,25 @@ func CreateClient(apiKey string) Client {
 }
 
 func (o Client) FetchWeatherForCity(city string) data.Weather {
+	request := o.createRequest(city)
+
+	response, err := o.client.Do(request)
+	if err != nil {
+		log.Printf("an error occured: %v", err)
+	}
+
+	weatherResponse := o.convertResponse(err, response)
+
+	weather := data.Weather{
+		Temperature: weatherResponse.Main.Temp,
+		Pressure:    weatherResponse.Main.Pressure,
+		CityName:    weatherResponse.Name,
+		CityId:      weatherResponse.Id,
+	}
+	return weather
+}
+
+func (o Client) createRequest(city string) *http.Request {
 	request, err := http.NewRequest("GET", o.baseUrl+"/data/2.5/weather", nil)
 	if err != nil {
 		log.Printf("an error occured: %v", err)
@@ -28,12 +47,10 @@ func (o Client) FetchWeatherForCity(city string) data.Weather {
 	q.Add("q", city)
 	q.Add("appid", o.apiKey)
 	request.URL.RawQuery = q.Encode()
+	return request
+}
 
-	response, err := o.client.Do(request)
-	if err != nil {
-		log.Printf("an error occured: %v", err)
-	}
-
+func (o Client) convertResponse(err error, response *http.Response) WeatherResponse {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Printf("an error occured: %v", err)
@@ -44,12 +61,5 @@ func (o Client) FetchWeatherForCity(city string) data.Weather {
 	if err != nil {
 		log.Printf("an error occured: %v", err)
 	}
-
-	weather := data.Weather{
-		Temperature: weatherResponse.Main.Temp,
-		Pressure:    weatherResponse.Main.Pressure,
-		CityName:    weatherResponse.Name,
-		CityId:      weatherResponse.Id,
-	}
-	return weather
+	return weatherResponse
 }
