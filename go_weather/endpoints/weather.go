@@ -15,8 +15,8 @@ type WeatherDataController struct {
 
 func (c WeatherDataController) Run() {
 	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/weather/{city}", c.CityHandler)
+	r.HandleFunc("/", HomeHandler).Methods("GET")
+	r.HandleFunc("/weather/{city}", c.CityHandler).Methods("GET")
 	r.Use(responseHeaderMiddleware)
 
 	http.Handle("/", r)
