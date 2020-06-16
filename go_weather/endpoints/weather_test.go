@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"../data"
+	"errors"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -9,6 +10,7 @@ import (
 )
 
 type Dummy struct {
+	err error
 }
 
 func (o Dummy) FetchWeatherForCity(city string) (data.Weather, error) {
@@ -18,7 +20,7 @@ func (o Dummy) FetchWeatherForCity(city string) (data.Weather, error) {
 		CityName:    "Twin Peaks",
 		CityId:      123,
 	}
-	return weather, nil
+	return weather, o.err
 }
 
 func TestFetchWeatherForCity(t *testing.T) {
@@ -30,6 +32,20 @@ func TestFetchWeatherForCity(t *testing.T) {
 
 	if responseRecorder.Code != 200 {
 		t.Errorf("expected code to be '200', but it was '%d'", responseRecorder.Code)
+	}
+
+	log.Printf("Response: '%s'", responseRecorder.Body.String())
+}
+
+func TestFetchWeatherForCityRespondsWithError(t *testing.T) {
+	request := http.Request{}
+
+	responseRecorder := httptest.NewRecorder()
+	controller := WeatherDataController{OpenWeatherMapClient: Dummy{err: errors.New("blubb")}}
+	controller.CityHandler(responseRecorder, &request)
+
+	if responseRecorder.Code != 500 {
+		t.Errorf("expected code to be '500', but it was '%d'", responseRecorder.Code)
 	}
 
 	log.Printf("Response: '%s'", responseRecorder.Body.String())
