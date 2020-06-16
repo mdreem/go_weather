@@ -3,14 +3,13 @@ package endpoints
 import (
 	"../openweather"
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
 type WeatherDataController struct {
-	OpenWeatherMapClient openweather.Client
+	OpenWeatherMapClient openweather.WeatherFetcher
 }
 
 func (c WeatherDataController) Run() {
@@ -38,22 +37,27 @@ func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *
 		return
 	}
 
-	err = json.NewEncoder(writer).Encode(weather)
+	respond(writer, weather, http.StatusOK)
+}
+
+func HomeHandler(writer http.ResponseWriter, _ *http.Request) {
+	respond(writer, nil, http.StatusOK)
+}
+
+func respond(writer http.ResponseWriter, data interface{}, statusCode int) {
+	if data == nil {
+		writer.WriteHeader(statusCode)
+		return
+	}
+
+	err := json.NewEncoder(writer).Encode(data)
 	if err != nil {
 		log.Println("error occurred while converting data:", err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
-}
-
-func HomeHandler(writer http.ResponseWriter, _ *http.Request) {
-	writer.WriteHeader(200)
-	_, err := fmt.Fprintf(writer, "Home\n")
-	if err != nil {
-		log.Println("error occurred:", err)
-	}
+	writer.WriteHeader(statusCode)
 }
 
 func responseHeaderMiddleware(next http.Handler) http.Handler {

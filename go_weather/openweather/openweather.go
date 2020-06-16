@@ -8,6 +8,10 @@ import (
 	"net/http"
 )
 
+type WeatherFetcher interface {
+	FetchWeatherForCity(city string) (data.Weather, error)
+}
+
 type Client struct {
 	baseUrl string
 	apiKey  string
