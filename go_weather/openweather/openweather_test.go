@@ -1,12 +1,15 @@
 package openweather
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestFetchWeatherForCity(t *testing.T) {
+	assertion := assert.New(t)
+
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		_, _ = rw.Write([]byte("{\"id\": 12345, \"name\": \"Twin Peaks\"}"))
 	}))
@@ -15,19 +18,13 @@ func TestFetchWeatherForCity(t *testing.T) {
 
 	weatherForCity, _ := client.FetchWeatherForCity("Twin Peaks")
 
-	if weatherForCity.CityName != "Twin Peaks" {
-		t.Errorf("expected city to be 'Twin Peaks', but it was '%s'", weatherForCity.CityName)
-	}
+	assertion.Equal("Twin Peaks", weatherForCity.CityName)
 }
 
 func TestOpenWeatherFactoryMethod(t *testing.T) {
+	assertion := assert.New(t)
 	client := CreateClient("someApiKey")
 
-	if client.baseUrl != "https://api.openweathermap.org" {
-		t.Errorf("baseUrl is '%s'", client.baseUrl)
-	}
-
-	if client.apiKey != "someApiKey" {
-		t.Errorf("expected apiKey to be 'someApiKey' but is was '%s'", client.apiKey)
-	}
+	assertion.Equal("https://api.openweathermap.org", client.baseUrl)
+	assertion.Equal("someApiKey", client.apiKey)
 }
