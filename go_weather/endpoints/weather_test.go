@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -54,10 +55,10 @@ func TestFetchWeatherForCityRespondsWithError(t *testing.T) {
 
 func TestRespondNoData(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
-	respond(responseRecorder, nil, 200)
+	respond(responseRecorder, nil, 202)
 
-	if responseRecorder.Code != 200 {
-		t.Errorf("expected code to be '200', but it was '%d'", responseRecorder.Code)
+	if responseRecorder.Code != 202 {
+		t.Errorf("expected code to be '202', but it was '%d'", responseRecorder.Code)
 	}
 }
 
@@ -71,6 +72,11 @@ func TestRespondWithData(t *testing.T) {
 
 	if responseRecorder.Code != 200 {
 		t.Errorf("expected code to be '200', but it was '%d'", responseRecorder.Code)
+	}
+
+	bodyString := strings.TrimSpace(responseRecorder.Body.String())
+	if bodyString != "{\"someTest\":2.5}" {
+		t.Errorf("expected code to be '{\"someTest\":2.5}', but it was '%s'", bodyString)
 	}
 }
 
