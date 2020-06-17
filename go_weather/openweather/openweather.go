@@ -3,6 +3,7 @@ package openweather
 import (
 	"../data"
 	"encoding/json"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -33,6 +34,11 @@ func (o Client) FetchWeatherForCity(city string) (data.Weather, error) {
 	if err != nil {
 		log.Printf("an error occured when executing the request: %v", err)
 		return data.Weather{}, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		log.Printf("Did receive status code %d", response.StatusCode)
+		return data.Weather{}, errors.New("wrong response code received")
 	}
 
 	weatherResponse, err := o.convertResponse(err, response)

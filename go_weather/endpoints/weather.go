@@ -12,17 +12,12 @@ type WeatherDataController struct {
 	OpenWeatherMapClient openweather.WeatherFetcher
 }
 
-func (c WeatherDataController) Run() {
+func (c WeatherDataController) SetupRoutes() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler).Methods("GET")
 	r.HandleFunc("/weather/{city}", c.CityHandler).Methods("GET")
 	r.Use(responseHeaderMiddleware)
-
-	http.Handle("/", r)
-	err := http.ListenAndServe(":8000", nil)
-	if err != nil {
-		log.Println("error occurred while starting http server:", err)
-	}
+	return r
 }
 
 func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *http.Request) {

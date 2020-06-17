@@ -5,6 +5,7 @@ import (
 	"./openweather"
 	"encoding/json"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -14,7 +15,12 @@ func main() {
 	openWeatherMapClient := openweather.CreateClient(configuration.ApiToken)
 
 	controller := endpoints.WeatherDataController{OpenWeatherMapClient: openWeatherMapClient}
-	controller.Run()
+	r := controller.SetupRoutes()
+
+	err := http.ListenAndServe(":8000", r)
+	if err != nil {
+		log.Println("error occurred while starting http server:", err)
+	}
 }
 
 type Configuration struct {
