@@ -41,7 +41,7 @@ func (o Client) FetchWeatherForCity(city string) (data.Weather, error) {
 		return data.Weather{}, errors.New("wrong response code received")
 	}
 
-	weatherResponse, err := o.convertResponse(err, response)
+	weatherResponse, err := o.convertResponse(response)
 	if err != nil {
 		log.Printf("an error occured while converting the response: %v", err)
 		return data.Weather{}, err
@@ -69,7 +69,7 @@ func (o Client) createRequest(city string) (*http.Request, error) {
 	return request, nil
 }
 
-func (o Client) convertResponse(err error, response *http.Response) (WeatherResponse, error) {
+func (o Client) convertResponse(response *http.Response) (WeatherResponse, error) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return WeatherResponse{}, err
