@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Build
-      run: go build -o weather -v ./go_weather/main.go
+      run: go build -o weather -v ./main.go
 
     - name: Test
       run: go test -v ./...
