@@ -86,3 +86,21 @@ func TestRespondWithError(t *testing.T) {
 
 	assertion.Equal(500, responseRecorder.Code)
 }
+
+func TestHomeHandler(t *testing.T) {
+	assertion := assert.New(t)
+
+	request, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
+	handler := controller.SetupRoutes()
+
+	responseRecorder := httptest.NewRecorder()
+	handler.ServeHTTP(responseRecorder, request)
+
+	assertion.Equal(200, responseRecorder.Code)
+	assertion.Equal(ApplicationJson, responseRecorder.Header().Get("Content-Type"))
+}
