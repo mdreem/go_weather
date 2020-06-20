@@ -34,4 +34,9 @@ jobs:
       run: go build -o weather -v ./main.go
 
     - name: Test
-      run: go test -v ./...
+      run: go test -v ./... -covermode=atomic -coverprofile=coverage.out
+
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.7
+      with:
+        file: coverage.out
