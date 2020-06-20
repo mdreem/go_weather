@@ -36,7 +36,7 @@ func TestFetchWeatherForCityInvalidUrl(t *testing.T) {
 
 	_, err := client.FetchWeatherForCity("Twin Peaks")
 
-	assertion.EqualError(err, "parse \u007f/data/2.5/weather: net/url: invalid control character in URL")
+	assertion.Error(err)
 }
 
 func TestFetchWeatherForCityInvalidTarget(t *testing.T) {
@@ -48,7 +48,7 @@ func TestFetchWeatherForCityInvalidTarget(t *testing.T) {
 
 	_, err := client.FetchWeatherForCity("Twin Peaks")
 
-	assertion.EqualError(err, "Get http://nothing/data/2.5/weather?appid=noKey&q=Twin+Peaks: dial tcp: lookup nothing: no such host")
+	assertion.Error(err)
 }
 
 func TestFetchWeatherForCityBadResponseCode(t *testing.T) {
