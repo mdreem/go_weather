@@ -11,6 +11,8 @@ import (
 	"testing"
 )
 
+const ApplicationJson = "application/json"
+
 type Dummy struct {
 	err error
 }
@@ -27,13 +29,20 @@ func (o Dummy) FetchWeatherForCity(_ string) (data.Weather, error) {
 
 func TestFetchWeatherForCity(t *testing.T) {
 	assertion := assert.New(t)
-	request := http.Request{}
+
+	request, err := http.NewRequest("GET", "/weather/NoCity", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
+	handler := controller.SetupRoutes()
 
 	responseRecorder := httptest.NewRecorder()
-	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
-	controller.CityHandler(responseRecorder, &request)
+	handler.ServeHTTP(responseRecorder, request)
 
 	assertion.Equal(200, responseRecorder.Code)
+	assertion.Equal(ApplicationJson, responseRecorder.Header().Get("Content-Type"))
 }
 
 func TestFetchWeatherForCityRespondsWithError(t *testing.T) {
