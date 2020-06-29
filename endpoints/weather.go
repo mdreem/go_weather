@@ -10,14 +10,7 @@ import (
 
 type WeatherDataController struct {
 	OpenWeatherMapClient openweather.WeatherFetcher
-}
-
-func (c WeatherDataController) SetupRoutes() *mux.Router {
-	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler).Methods("GET")
-	r.HandleFunc("/weather/{city}", c.CityHandler).Methods("GET")
-	r.Use(responseHeaderMiddleware)
-	return r
+	KeycloakClientSecret string
 }
 
 func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *http.Request) {
@@ -35,7 +28,7 @@ func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *
 	respond(writer, weather, http.StatusOK)
 }
 
-func HomeHandler(writer http.ResponseWriter, _ *http.Request) {
+func (c WeatherDataController) HomeHandler(writer http.ResponseWriter, request *http.Request) {
 	respond(writer, nil, http.StatusOK)
 }
 

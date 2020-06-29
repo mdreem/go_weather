@@ -1,3 +1,4 @@
 {
-  "apiToken": "SOME_API_TOKEN"
+  "apiToken": "SOME_API_TOKEN",
+  "keycloakWeatherClientSecret": "01c2497e-1cfb-45bb-844d-482f75bd9a6a"
 }

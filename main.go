@@ -14,7 +14,8 @@ func main() {
 
 	openWeatherMapClient := openweather.CreateClient(configuration.ApiToken)
 
-	controller := endpoints.WeatherDataController{OpenWeatherMapClient: openWeatherMapClient}
+	controller := endpoints.WeatherDataController{OpenWeatherMapClient: openWeatherMapClient,
+		KeycloakClientSecret: configuration.KeycloakWeatherClientSecret}
 	r := controller.SetupRoutes()
 
 	err := http.ListenAndServe(":8000", r)
@@ -24,7 +25,8 @@ func main() {
 }
 
 type Configuration struct {
-	ApiToken string
+	ApiToken                    string
+	KeycloakWeatherClientSecret string
 }
 
 func loadConfiguration() Configuration {
