@@ -27,24 +27,6 @@ func (o Dummy) FetchWeatherForCity(_ string) (data.Weather, error) {
 	return weather, o.err
 }
 
-func TestFetchWeatherForCity(t *testing.T) {
-	assertion := assert.New(t)
-
-	request, err := http.NewRequest("GET", "/weather/NoCity", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
-	handler := controller.SetupRoutes()
-
-	responseRecorder := httptest.NewRecorder()
-	handler.ServeHTTP(responseRecorder, request)
-
-	assertion.Equal(200, responseRecorder.Code)
-	assertion.Equal(ApplicationJson, responseRecorder.Header().Get("Content-Type"))
-}
-
 func TestFetchWeatherForCityRespondsWithError(t *testing.T) {
 	assertion := assert.New(t)
 	request := http.Request{}
@@ -85,22 +67,4 @@ func TestRespondWithError(t *testing.T) {
 	respond(responseRecorder, math.Inf(1), 200)
 
 	assertion.Equal(500, responseRecorder.Code)
-}
-
-func TestHomeHandler(t *testing.T) {
-	assertion := assert.New(t)
-
-	request, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
-	handler := controller.SetupRoutes()
-
-	responseRecorder := httptest.NewRecorder()
-	handler.ServeHTTP(responseRecorder, request)
-
-	assertion.Equal(200, responseRecorder.Code)
-	assertion.Equal(ApplicationJson, responseRecorder.Header().Get("Content-Type"))
 }
