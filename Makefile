@@ -22,3 +22,6 @@ run: build
 
 compile:
 	GOOS=linux GOARCH=arm64 go build -o bin/${BINARY_NAME}-linux-arm64 main.go
+
+keycloak:
+	docker-compose -f docker/keycloak.yaml up

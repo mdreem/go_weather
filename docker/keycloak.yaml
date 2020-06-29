@@ -1,0 +1,12 @@
+version: '3'
+services:
+  keycloak:
+    container_name: goweather-keycloak
+    image: "jboss/keycloak:10.0.2"
+    entrypoint:
+      - '/opt/jboss/keycloak_entry.sh'
+    ports:
+      - "8080:8080"
+    volumes:
+    - ./data/keycloak-export.json:/opt/jboss/keycloak-export.json
+    - ./data/keycloak_entry.sh:/opt/jboss/keycloak_entry.sh
