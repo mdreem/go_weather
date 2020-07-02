@@ -13,7 +13,7 @@ jobs:
 
     services:
       keycloak:
-        image: "docker.pkg.github.com/mdreem/go_weather/keycloak:0.0.1"
+        image: "mdreem/keycloak_testing@sha256:f653aeddf446f146633e52e6fde52a23e404fce8347d35adc7d6f7d2afd0b141"
         ports:
           - "8080:8080"
 
