@@ -25,3 +25,6 @@ compile:
 
 keycloak:
 	docker-compose -f docker/keycloak.yaml up
+
+lint:
+	golangci-lint run
