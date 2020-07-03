@@ -6,7 +6,6 @@ import (
 )
 
 func (auth auth) handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%v", auth.ctx)
 	oauth2Token, err := auth.oauth2Config.Exchange(*auth.ctx, r.URL.Query().Get("code"))
 	if err != nil {
 		panic(err)
@@ -23,7 +22,7 @@ func (auth auth) handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (auth auth) handleLogin(w http.ResponseWriter, r *http.Request) {
+func (auth auth) handleLogin(writer http.ResponseWriter, request *http.Request) {
 	log.Printf("Data: %s", auth.oauth2Config.ClientID)
-	http.Redirect(w, r, auth.oauth2Config.AuthCodeURL("main"), http.StatusFound)
+	http.Redirect(writer, request, auth.oauth2Config.AuthCodeURL("main"), http.StatusFound)
 }
