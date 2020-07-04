@@ -8,16 +8,19 @@ import (
 func (auth auth) handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 	oauth2Token, err := auth.oauth2Config.Exchange(*auth.ctx, r.URL.Query().Get("code"))
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		panic(err)
 	}
 
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
 		panic("Missing token")
 	}
 
 	_, err = w.Write([]byte(rawIDToken))
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		panic(err)
 	}
 }
