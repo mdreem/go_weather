@@ -36,7 +36,8 @@ func (auth auth) handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 	oauth2Token, err := auth.oauth2Config.Exchange(*auth.ctx, r.URL.Query().Get("code"))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		panic(err)
+		log.Printf("could not exchange code for token: %v", err)
+		return
 	}
 
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)

@@ -2,12 +2,29 @@ package endpoints
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
+
+type OAuth2TestConfig struct {
+	exchangeError error
+}
+
+func (config OAuth2TestConfig) Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	return nil, config.exchangeError
+}
+
+func (config OAuth2TestConfig) AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string {
+	return ""
+}
+
+func (config OAuth2TestConfig) GetClientID() string {
+	return ""
+}
 
 func TestHandleOAuth2Callback(t *testing.T) {
 	assertion := assert.New(t)
@@ -65,4 +82,26 @@ func TestHandleLogin(t *testing.T) {
 
 	assertion.Equal(http.StatusFound, responseRecorder.Code)
 	assertion.Equal(".?client_id=TestClient&redirect_uri=RedirectMe&response_type=code&state=main", responseRecorder.Header().Get("Location"))
+}
+
+func TestHandleOAuth2CallbackExchangeFailed(t *testing.T) {
+	assertion := assert.New(t)
+
+	request, err := http.NewRequest("GET", "someUrl", nil)
+	if err != nil {
+		panic(err)
+	}
+	responseRecorder := httptest.NewRecorder()
+
+	ctx := context.Background()
+	auth := auth{
+		oauth2Config: OAuth2TestConfig{
+			exchangeError: errors.New("exchange error"),
+		},
+		ctx: &ctx,
+	}
+
+	auth.handleOAuth2Callback(responseRecorder, request)
+
+	assertion.Equal(500, responseRecorder.Code)
 }
