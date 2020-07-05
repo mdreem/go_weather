@@ -40,7 +40,7 @@ func TestHandleOAuth2Callback(t *testing.T) {
 	}
 	ctx := context.Background()
 
-	auth := auth{ctx: &ctx, oauth2Config: &config}
+	auth := auth{ctx: &ctx, oauth2Config: OAuth2Config{config: &config}}
 	responseRecorder := httptest.NewRecorder()
 
 	auth.handleOAuth2Callback(responseRecorder, request)
@@ -58,7 +58,7 @@ func TestHandleLogin(t *testing.T) {
 	}
 
 	config := oauth2.Config{ClientID: "TestClient", RedirectURL: "RedirectMe"}
-	auth := auth{oauth2Config: &config}
+	auth := auth{oauth2Config: OAuth2Config{config: &config}}
 	responseRecorder := httptest.NewRecorder()
 
 	auth.handleLogin(responseRecorder, request)

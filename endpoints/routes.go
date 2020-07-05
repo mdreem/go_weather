@@ -10,12 +10,6 @@ import (
 	"strings"
 )
 
-type auth struct {
-	oauth2Config *oauth2.Config
-	verifier     *oidc.IDTokenVerifier
-	ctx          *context.Context
-}
-
 func (c WeatherDataController) SetupRoutes() *mux.Router {
 	auth := initializeOpenIdConnect(c.KeycloakClientSecret)
 
@@ -32,6 +26,10 @@ func (c WeatherDataController) SetupRoutes() *mux.Router {
 	oidcHandler.HandleFunc("/login", auth.handleLogin).Methods("GET")
 
 	return r
+}
+
+type OAuth2Config struct {
+	config *oauth2.Config
 }
 
 func initializeOpenIdConnect(clientSecret string) *auth {
@@ -57,10 +55,11 @@ func initializeOpenIdConnect(clientSecret string) *auth {
 	oidcConfig := &oidc.Config{
 		ClientID: clientID,
 	}
+
 	var verifier = provider.Verifier(oidcConfig)
 
 	auth := auth{
-		oauth2Config: &oauth2Config,
+		oauth2Config: OAuth2Config{config: &oauth2Config},
 		verifier:     verifier,
 		ctx:          &ctx,
 	}
