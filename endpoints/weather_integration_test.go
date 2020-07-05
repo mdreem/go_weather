@@ -65,6 +65,7 @@ func TestFetchWeatherForCity(t *testing.T) {
 
 	assertion.Equal(200, responseRecorder.Code)
 	assertion.Equal(ApplicationJson, responseRecorder.Header().Get("Content-Type"))
+	assertion.Equal("{\"temperature\":30.1,\"pressure\":1000,\"cityName\":\"Twin Peaks\",\"cityId\":123}\n", responseRecorder.Body.String())
 }
 
 func TestHomeHandler(t *testing.T) {
@@ -85,4 +86,5 @@ func TestHomeHandler(t *testing.T) {
 
 	assertion.Equal(200, responseRecorder.Code)
 	assertion.Equal(ApplicationJson, responseRecorder.Header().Get("Content-Type"))
+	assertion.Equal("{\"Home\":\"sweet Home\"}\n", responseRecorder.Body.String())
 }

@@ -28,8 +28,11 @@ func (c WeatherDataController) CityHandler(writer http.ResponseWriter, request *
 	respond(writer, weather, http.StatusOK)
 }
 
-func (c WeatherDataController) HomeHandler(writer http.ResponseWriter, request *http.Request) {
-	respond(writer, nil, http.StatusOK)
+func (c WeatherDataController) HomeHandler(writer http.ResponseWriter, _ *http.Request) {
+	type homeHandler struct {
+		Home string
+	}
+	respond(writer, homeHandler{Home: "sweet Home"}, http.StatusOK)
 }
 
 func respond(writer http.ResponseWriter, data interface{}, statusCode int) {

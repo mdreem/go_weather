@@ -10,13 +10,19 @@ import (
 	"testing"
 )
 
+type HttpHandlerTestData struct {
+}
+
+func (httpHandlerTestData HttpHandlerTestData) ServeHTTP(http.ResponseWriter, *http.Request) {
+}
+
 func TestAuthenticationHandlerAccessTokenMissing(t *testing.T) {
 	assertion := assert.New(t)
 	request := http.Request{Header: make(http.Header)}
 
 	auth := auth{}
 	responseRecorder := httptest.NewRecorder()
-	auth.authenticationHandler(responseRecorder, &request)
+	auth.authenticationHandler(HttpHandlerTestData{}, responseRecorder, &request)
 
 	assertion.Equal(http.StatusUnauthorized, responseRecorder.Code)
 }
@@ -28,7 +34,7 @@ func TestAuthenticationHandlerAccessTokenWrongFormat(t *testing.T) {
 
 	auth := auth{}
 	responseRecorder := httptest.NewRecorder()
-	auth.authenticationHandler(responseRecorder, &request)
+	auth.authenticationHandler(HttpHandlerTestData{}, responseRecorder, &request)
 
 	assertion.Equal(http.StatusBadRequest, responseRecorder.Code)
 }
@@ -57,7 +63,7 @@ func TestAuthenticationHandlerAccessTokenCannotBeVerified(t *testing.T) {
 
 	auth := auth{ctx: &ctx, verifier: failingVerifier}
 	responseRecorder := httptest.NewRecorder()
-	auth.authenticationHandler(responseRecorder, &request)
+	auth.authenticationHandler(HttpHandlerTestData{}, responseRecorder, &request)
 
 	assertion.Equal(http.StatusUnauthorized, responseRecorder.Code)
 }

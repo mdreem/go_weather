@@ -35,7 +35,18 @@ func TestFetchWeatherForCityRespondsWithError(t *testing.T) {
 	controller := WeatherDataController{OpenWeatherMapClient: Dummy{err: errors.New("blubb")}}
 	controller.CityHandler(responseRecorder, &request)
 
-	assertion.Equal(500, responseRecorder.Code)
+	assertion.Equal(http.StatusInternalServerError, responseRecorder.Code)
+}
+
+func TestFetchWeatherForCityRespondsSuccessfully(t *testing.T) {
+	assertion := assert.New(t)
+	request := http.Request{}
+
+	responseRecorder := httptest.NewRecorder()
+	controller := WeatherDataController{OpenWeatherMapClient: Dummy{err: nil}}
+	controller.CityHandler(responseRecorder, &request)
+
+	assertion.Equal(http.StatusOK, responseRecorder.Code)
 }
 
 func TestRespondNoData(t *testing.T) {

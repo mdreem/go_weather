@@ -67,10 +67,12 @@ func initializeOpenIdConnect(clientSecret string) *auth {
 }
 
 func (auth auth) authenticationHandlerMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(auth.authenticationHandler)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth.authenticationHandler(next, w, r)
+	})
 }
 
-func (auth auth) authenticationHandler(writer http.ResponseWriter, request *http.Request) {
+func (auth auth) authenticationHandler(next http.Handler, writer http.ResponseWriter, request *http.Request) {
 	rawAccessToken := request.Header.Get("Authorization")
 
 	if rawAccessToken == "" {
@@ -92,4 +94,6 @@ func (auth auth) authenticationHandler(writer http.ResponseWriter, request *http
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	next.ServeHTTP(writer, request)
 }
