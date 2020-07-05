@@ -12,10 +12,11 @@ import (
 
 type OAuth2TestConfig struct {
 	exchangeError error
+	token         *oauth2.Token
 }
 
 func (config OAuth2TestConfig) Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
-	return nil, config.exchangeError
+	return config.token, config.exchangeError
 }
 
 func (config OAuth2TestConfig) AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string {
@@ -104,4 +105,56 @@ func TestHandleOAuth2CallbackExchangeFailed(t *testing.T) {
 	auth.handleOAuth2Callback(responseRecorder, request)
 
 	assertion.Equal(500, responseRecorder.Code)
+}
+
+func TestHandleOAuth2CallbackTokenMissing(t *testing.T) {
+	assertion := assert.New(t)
+
+	request, err := http.NewRequest("GET", "someUrl", nil)
+	if err != nil {
+		panic(err)
+	}
+	responseRecorder := httptest.NewRecorder()
+
+	ctx := context.Background()
+	tokenMap := make(map[string]interface{})
+	token := oauth2.Token{}
+	tokenWithExtraData := token.WithExtra(tokenMap)
+	auth := auth{
+		oauth2Config: OAuth2TestConfig{
+			token: tokenWithExtraData,
+		},
+		ctx: &ctx,
+	}
+
+	auth.handleOAuth2Callback(responseRecorder, request)
+
+	assertion.Equal(500, responseRecorder.Code)
+}
+
+func TestHandleOAuth2CallbackWriteResponseFailed(t *testing.T) {
+	assertion := assert.New(t)
+
+	request, err := http.NewRequest("GET", "someUrl", nil)
+	if err != nil {
+		panic(err)
+	}
+	responseRecorder := httptest.NewRecorder()
+
+	ctx := context.Background()
+	tokenMap := make(map[string]interface{})
+	tokenMap["id_token"] = "someToken"
+	token := oauth2.Token{}
+	tokenWithExtraData := token.WithExtra(tokenMap)
+	auth := auth{
+		oauth2Config: OAuth2TestConfig{
+			token: tokenWithExtraData,
+		},
+		ctx: &ctx,
+	}
+
+	auth.handleOAuth2Callback(responseRecorder, request)
+
+	assertion.Equal(http.StatusOK, responseRecorder.Code)
+	assertion.Equal("someToken", responseRecorder.Body.String())
 }

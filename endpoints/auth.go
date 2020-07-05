@@ -43,13 +43,15 @@ func (auth auth) handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
-		panic("Missing token")
+		log.Printf("missing token")
+		return
 	}
 
 	_, err = w.Write([]byte(rawIDToken))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		panic(err)
+		log.Printf("not able to write token")
+		return
 	}
 }
 
