@@ -16,7 +16,7 @@ type TokenResponse struct {
 	IdToken string `json:"id_token"`
 }
 
-func getToken() string {
+func getToken(t *testing.T) string {
 	data := url.Values{}
 	data.Set("client_id", "weather")
 	data.Set("grant_type", "password")
@@ -28,7 +28,7 @@ func getToken() string {
 	const keycloakTokenUrl = "http://localhost:8080/auth/realms/Weather/protocol/openid-connect/token"
 	request, err := http.NewRequest("POST", keycloakTokenUrl, strings.NewReader(data.Encode()))
 	if err != nil {
-		panic(err)
+		t.Fatalf("err: %v", err)
 	}
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
@@ -36,12 +36,12 @@ func getToken() string {
 	response, _ := client.Do(request)
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		panic(err)
+		t.Fatalf("err: %v", err)
 	}
 	tokenResponse := TokenResponse{}
 	err = json.Unmarshal(body, &tokenResponse)
 	if err != nil {
-		panic(err)
+		t.Fatalf("err: %v", err)
 	}
 
 	return tokenResponse.IdToken
@@ -54,7 +54,7 @@ func TestFetchWeatherForCity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bearerToken := fmt.Sprintf("Bearer %s", getToken())
+	bearerToken := fmt.Sprintf("Bearer %s", getToken(t))
 	request.Header.Add("Authorization", bearerToken)
 
 	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
@@ -75,7 +75,7 @@ func TestHomeHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	bearerToken := fmt.Sprintf("Bearer %s", getToken())
+	bearerToken := fmt.Sprintf("Bearer %s", getToken(t))
 	request.Header.Add("Authorization", bearerToken)
 
 	controller := WeatherDataController{OpenWeatherMapClient: Dummy{}}
