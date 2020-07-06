@@ -27,45 +27,36 @@ func TestOpenWeatherFactoryMethod(t *testing.T) {
 	assertion.Equal("someApiKey", client.apiKey)
 }
 
-func TestFetchWeatherForCityInvalidUrl(t *testing.T) {
+func TestFetchWeatherForCityErrorScenarios(t *testing.T) {
 	assertion := assert.New(t)
 
-	server := createTestServer(200, t)
-	defer server.Close()
-	client := Client{baseUrl: string(0x7f), apiKey: "noKey", client: server.Client()}
+	testCases := []struct {
+		name         string
+		statusCode   int
+		baseUrl      string
+		errorMessage string
+	}{
+		{"Invalid Url", http.StatusOK, string(0x7f), "invalid control character in URL"},
+		{"Invalid target", http.StatusOK, "http://nothing", "dial tcp: lookup nothing"},
+		{"Bad response code", http.StatusInternalServerError, "", "wrong response code received"},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			server := createTestServer(tc.statusCode, t)
+			defer server.Close()
 
-	_, err := client.FetchWeatherForCity("Twin Peaks")
+			baseUrl := tc.baseUrl
+			if baseUrl == "" {
+				baseUrl = server.URL
+			}
+			client := Client{baseUrl: baseUrl, apiKey: "noKey", client: server.Client()}
 
-	assertion.Error(err)
-	assertion.Regexp("invalid control character in URL", err.Error())
-}
+			_, err := client.FetchWeatherForCity("Twin Peaks")
 
-func TestFetchWeatherForCityInvalidTarget(t *testing.T) {
-	assertion := assert.New(t)
-
-	server := createTestServer(200, t)
-	defer server.Close()
-	client := Client{baseUrl: "http://nothing", apiKey: "noKey", client: server.Client()}
-
-	_, err := client.FetchWeatherForCity("Twin Peaks")
-
-	assertion.Error(err)
-	assertion.Regexp("dial tcp: lookup nothing", err.Error())
-}
-
-func TestFetchWeatherForCityBadResponseCode(t *testing.T) {
-	assertion := assert.New(t)
-
-	t.Run("Bad response code", func(t *testing.T) {
-		server := createTestServer(500, t)
-		defer server.Close()
-		client := Client{baseUrl: server.URL, apiKey: "noKey", client: server.Client()}
-
-		_, err := client.FetchWeatherForCity("Twin Peaks")
-
-		assertion.Error(err)
-		assertion.Regexp("wrong response code received", err.Error())
-	})
+			assertion.Error(err)
+			assertion.Regexp(tc.errorMessage, err.Error())
+		})
+	}
 }
 
 func TestFetchWeather(t *testing.T) {
